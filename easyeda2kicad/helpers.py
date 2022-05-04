@@ -19,6 +19,7 @@ def get_cad_data(component_id: str):
     api = easyeda_api()
     return api.get_cad_data_of_component(lcsc_id=component_id)
 
+
 def generate_symbol(cad_data: str, component_id: str, output: str, overwrite: bool):
     importer = easyeda_symbol_importer(easyeda_cp_cad_data=cad_data)
     easyeda_symbol: ee_symbol = importer.get_symbol()
@@ -45,9 +46,7 @@ def generate_symbol(cad_data: str, component_id: str, output: str, overwrite: bo
             component_name=easyeda_symbol.info.name,
         )
 
-    with open(
-        file=f"{output}.lib", mode="a+", encoding="utf-8"
-    ) as my_lib:
+    with open(file=f"{output}.lib", mode="a+", encoding="utf-8") as my_lib:
         my_lib.write(kicad_symbol_lib)
 
 
@@ -68,11 +67,13 @@ def generate_footprint(cad_data: str, component_id: str, output: str, overwrite:
         output_path=output
     )
 
+
 def generate_3dmodel(cad_data: str, component_id: str, output: str):
     print(f"[*] Creating 3D model for LCSC id : {component_id}")
     exporter = exporter_3d_model_kicad(
         model_3d=easyeda_3d_model_importer(easyeda_cp_cad_data=cad_data).output
     ).export(lib_path=output)
+
 
 def valid_arguments(arguments: dict) -> bool:
 

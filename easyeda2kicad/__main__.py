@@ -88,24 +88,36 @@ def main(argv: List[str] = sys.argv[1:]) -> int:
             return 1
 
         component_id = arguments["lcsc_id"]
-        overwrite = arguments['overwrite']
-        output = arguments['output']
-        
+        overwrite = arguments["overwrite"]
+        output = arguments["output"]
+
         print("-- easyeda2kicad.py --")
 
         cad_data = get_cad_data(component_id=component_id)
 
         # ---------------- SYMBOL ----------------
         if arguments["symbol"]:
-            generate_symbol(cad_data=cad_data, component_id=component_id, overwrite=overwrite, output=output)
+            generate_symbol(
+                cad_data=cad_data,
+                component_id=component_id,
+                overwrite=overwrite,
+                output=output,
+            )
 
         # ---------------- FOOTPRINT ----------------
         if arguments["footprint"]:
-            generate_footprint(cad_data=cad_data, component_id=component_id, overwrite=overwrite, output=output)
+            generate_footprint(
+                cad_data=cad_data,
+                component_id=component_id,
+                overwrite=overwrite,
+                output=output,
+            )
 
         # ---------------- 3D MODEL ----------------
         if arguments["3d"]:
-            generate_3dmodel(cad_data=cad_data, component_id=component_id, output=output)
+            generate_3dmodel(
+                cad_data=cad_data, component_id=component_id, output=output
+            )
 
         return 0
 
