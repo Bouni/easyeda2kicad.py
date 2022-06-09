@@ -1,15 +1,18 @@
 # Global imports
+import os
+import pathlib
 from ast import arg
 
 import wx
-from helpers import (
+from numpy import outer
+
+from easyeda2kicad.helpers import (
     generate_3dmodel,
     generate_footprint,
     generate_symbol,
     get_cad_data,
     valid_arguments,
 )
-from numpy import outer
 
 
 class Gui(wx.Frame):
@@ -48,6 +51,7 @@ class Gui(wx.Frame):
             wx.Size(300, -1),
             0,
         )
+        self.symbol_checkbox.SetValue(True)
         h2_sizer.Add(self.symbol_checkbox, 0, wx.LEFT | wx.RIGHT, 5)
 
         # ---------------- Footprint ----------------
@@ -69,6 +73,7 @@ class Gui(wx.Frame):
             wx.Size(300, -1),
             0,
         )
+        self.footprint_checkbox.SetValue(True)
         h3_sizer.Add(self.footprint_checkbox, 0, wx.LEFT | wx.RIGHT, 5)
 
         # ---------------- 3D model ----------------
@@ -90,6 +95,7 @@ class Gui(wx.Frame):
             wx.Size(300, -1),
             0,
         )
+        self.model_checkbox.SetValue(True)
         h4_sizer.Add(self.model_checkbox, 0, wx.LEFT | wx.RIGHT, 5)
 
         # ---------------- Overwrite ----------------
@@ -114,15 +120,27 @@ class Gui(wx.Frame):
         h5_sizer.Add(self.overwrite_checkbox, 0, wx.LEFT | wx.RIGHT, 5)
 
         # ---------------- Library path ----------------
+
+        username = os.getlogin()
+        self.library_path = pathlib.Path(
+            f"C:/Users/{username}/Documents/KiCad/easyeda2kicad/easyeda2kicad"
+        )
+
         h6_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.output_label = wx.StaticText(
-            panel, wx.ID_ANY, "Library path", wx.DefaultPosition, wx.Size(200, -1), 0
+            panel,
+            wx.ID_ANY,
+            str(self.library_path),
+            wx.DefaultPosition,
+            wx.Size(-1, -1),
+            0,
         )
         h6_sizer.Add(self.output_label, 1, wx.LEFT | wx.RIGHT | wx.TOP, 5)
-        self.output_textctrl = wx.TextCtrl(
-            panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(300, -1), 0
-        )
-        h6_sizer.Add(self.output_textctrl, 0, wx.LEFT | wx.RIGHT, 5)
+
+        h7_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.select_output_button = wx.Button(panel, label="Select library path")
+        self.select_output_button.Bind(wx.EVT_BUTTON, self.select_output_path)
+        h7_sizer.Add(self.select_output_button, 0, wx.LEFT | wx.RIGHT, 5)
 
         main_sizer.Add(h1_sizer, 0, wx.ALL | wx.CENTER, 5)
         main_sizer.Add(h2_sizer, 0, wx.ALL | wx.CENTER, 5)
@@ -130,6 +148,7 @@ class Gui(wx.Frame):
         main_sizer.Add(h4_sizer, 0, wx.ALL | wx.CENTER, 5)
         main_sizer.Add(h5_sizer, 0, wx.ALL | wx.CENTER, 5)
         main_sizer.Add(h6_sizer, 0, wx.ALL | wx.CENTER, 5)
+        main_sizer.Add(h7_sizer, 0, wx.ALL | wx.CENTER, 5)
 
         download_button = wx.Button(panel, label="Download")
 
@@ -139,6 +158,18 @@ class Gui(wx.Frame):
         panel.SetSizer(main_sizer)
         self.Show()
 
+    def select_output_path(self, e):
+        dlg = wx.FileDialog(
+            self,
+            message="Choose a folder",
+            defaultDir=str(self.library_path.parent),
+            defaultFile=str(self.library_path.name),
+        )
+        if dlg.ShowModal() == wx.ID_OK:
+            self.library_path = pathlib.Path(dlg.GetPath())
+            self.output_label.SetLabel(str(self.library_path))
+        dlg.Destroy()
+
     def download(self, e):
         arguments = {
             "lcsc_id": self.lcsc_id_textctrl.GetValue(),
@@ -146,7 +177,7 @@ class Gui(wx.Frame):
             "footprint": self.footprint_checkbox.GetValue(),
             "3d": self.model_checkbox.GetValue(),
             "overwrite": self.overwrite_checkbox.GetValue(),
-            "output": self.output_textctrl.GetValue(),
+            "output": str(self.library_path),
             "full": None,
         }
 

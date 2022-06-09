@@ -6,8 +6,9 @@ import sys
 from typing import List
 
 import wx
-from gui import Gui
-from helpers import (
+
+from easyeda2kicad.gui import Gui
+from easyeda2kicad.helpers import (
     generate_3dmodel,
     generate_footprint,
     generate_symbol,
